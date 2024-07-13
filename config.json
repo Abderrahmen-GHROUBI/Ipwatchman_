@@ -1,0 +1,19 @@
+{
+    "database": {
+        "username": "",
+        "password": "",
+        "server": "",
+        "database": "IpWatchman",
+        "driver": "ODBC Driver 17 for SQL Server"
+    },
+    "email": {
+        "smtp_server": "",
+        "port": 587,
+        "username": "",
+        "password": ""
+    },
+    "logger": {
+        "log_file": "./ipwatchman.log",
+        "level": "INFO"
+    }
+}
