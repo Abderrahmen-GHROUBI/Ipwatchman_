@@ -1,14 +1,15 @@
+# ipwatchman.py
 import subprocess
 import time
 from datetime import datetime
-import concurrent.futures
 import threading
 import ipaddress
 from Database import add_ip_event
 from logger import logger
 
-db_lock = threading.Lock()
 
+db_lock = threading.Lock()
+stop_event = threading.Event()
 
 def ping_ip(ip, packet_size, timeout=1000):
     try:
@@ -40,10 +41,10 @@ def ping_ip(ip, packet_size, timeout=1000):
         return False
 
 def Ipwatchman(ip_address, packet_size=2, timeout=1, timepar=0):
-    while True:
+    while True:  
         result = ping_ip(ip_address, packet_size, timeout)
         print(f"Ping result for {ip_address}: {result}")
-        
+
         if not result:
             time.sleep(timepar)
             if not ping_ip(ip_address, packet_size, timeout):
@@ -56,16 +57,19 @@ def Ipwatchman(ip_address, packet_size=2, timeout=1, timepar=0):
                                  date_=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
                 while not ping_ip(ip_address, packet_size, timeout):
+                    if stop_event.is_set(): 
+                        break
                     print(f"Ping failed: {ip_address}. Waiting to recover...")
-                    time.sleep(timepar)
-
+                    
+                    
+                if stop_event.is_set():  
+                        break
                 recovery_time = int((datetime.now() - fail_time).total_seconds())
                 print(f"{ip_address} is reachable after {recovery_time} seconds.")
                 logger.info(f"{ip_address} is reachable after {recovery_time} seconds.")
                 with db_lock:
                     add_ip_event(ip_address=ip_address, event_type="Recovery",
                                  date_=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), recovery_time=recovery_time)
-
 
 def read_ips_from_file(file_path='ips.txt'):
     
@@ -80,6 +84,17 @@ if __name__ == "__main__":
     timeout = 10
     timepar=0
     #timepar=60
+    
+    threads = []
+    for ip_address in ip_addresses:
+          thread = threading.Thread(target=Ipwatchman, args=(ip_address, packet_size, timeout, timepar))
+          threads.append(thread)
+          thread.start()
+          
+    time.sleep(2)
+    stop_event.set()
+    [thread.join() for thread in threads]
+  
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        futures = [executor.submit(Ipwatchman, ip_address, packet_size, timeout,timepar) for ip_address in ip_addresses]
+    
+    

@@ -1,4 +1,4 @@
 ipaddress
 pyodbc
 sqlalchemy 
-
+pywin32
