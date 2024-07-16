@@ -1,8 +1,8 @@
 {
     "database": {
-        "username": "MSI",
-        "password": "x0we80/gh",
-        "server": "DESKTOP-6D9B7GC\\SQLEXPRESS",
+        "username": "",
+        "password": "",
+        "server": "",
         "database": "IpWatchman",
         "driver": "ODBC Driver 17 for SQL Server"
     },
