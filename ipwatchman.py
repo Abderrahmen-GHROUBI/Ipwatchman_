@@ -1,4 +1,5 @@
 # ipwatchman.py
+import os
 import subprocess
 import time
 from datetime import datetime
@@ -72,7 +73,8 @@ def Ipwatchman(ip_address, packet_size=2, timeout=1, timepar=0):
                                  date_=datetime.now().strftime("%Y-%m-%d %H:%M:%S"), recovery_time=recovery_time)
 
 def read_ips_from_file(file_path='ips.txt'):
-    
+    file_path = os.path.join(os.path.dirname(__file__), 'ips.txt')
+
     with open(file_path, 'r') as file:
          ips = [line.strip() for line in file]
     return ips

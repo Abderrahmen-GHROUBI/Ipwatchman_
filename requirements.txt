@@ -1,6 +1,5 @@
 ipaddress
 pyodbc
 sqlalchemy 
-<<<<<<< HEAD
 pywin32
 
